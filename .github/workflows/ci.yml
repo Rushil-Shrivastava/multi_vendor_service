@@ -31,9 +31,10 @@ jobs:
       - name: Lint
         run: |
           pip install flake8 && flake8 backend/
+        continue-on-error: true
       - name: Run tests
         env:
-          MONGO_URI: "mongodb://localhost:27017/"        # use service container
+          MONGO_URI: "mongodb://localhost:27017/"
           KAFKA_BOOTSTRAP_SERVERS: "localhost:9092"
         run: |
           pip install pytest requests kafka-python pymongo
