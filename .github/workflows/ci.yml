@@ -1,0 +1,40 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:6.0
+        ports: [27017:27017]
+      kafka:
+        image: bitnami/kafka:latest
+        env:
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+          ALLOW_PLAINTEXT_LISTENER: yes
+        ports: [9092:9092]
+      zookeeper:
+        image: bitnami/zookeeper:latest
+        env:
+          ALLOW_ANONYMOUS_LOGIN: yes
+        ports: [2181:2181]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          pip install -r backend/requirements.txt
+      - name: Lint
+        run: |
+          pip install flake8 && flake8 backend/
+      - name: Run tests
+        env:
+          MONGO_URI: "mongodb://localhost:27017/"        # use service container
+          KAFKA_BOOTSTRAP_SERVERS: "localhost:9092"
+        run: |
+          pip install pytest requests kafka-python pymongo
+          pytest -q backend/tests

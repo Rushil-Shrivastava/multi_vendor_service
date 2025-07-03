@@ -1,0 +1,9 @@
+# Python
+__pycache__/
+*.pyc
+# Docker
+*.log
+# OS
+.DS_Store
+# pytest
+.pytest_cache/
